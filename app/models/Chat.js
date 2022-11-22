@@ -1,37 +1,12 @@
 const mongoose = require("mongoose");
 
-const ChatSchema = new mongoose.Schema({
-  sender: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+const ChatSchema = new mongoose.Schema(
+  {
+    members: {
+      type: Array,
+    },
   },
-  messages: [
-    {
-      message: String,
-      meta: [
-        {
-          user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-          },
-          delivered: Boolean,
-          read: Boolean,
-        },
-      ],
-    },
-  ],
-  is_group_message: { type: Boolean, default: false },
-  participants: [
-    {
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-      delivered: Boolean,
-      read: Boolean,
-      last_seen: Date,
-    },
-  ],
-});
+  { timestamps: true }
+);
 
 mongoose.model("Chat", ChatSchema);

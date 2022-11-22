@@ -3,7 +3,19 @@ const cors = require("cors");
 const path = require("path");
 const passport = require("passport");
 const app = express();
+const io = require("socket.io");
+const http = require("http").Server(app);
+/***
+ *  ------------- Socket IO --------------------
+ */
+socket = io(http);
+socket.on("connection", (socket) => {
+  console.log("user connected");
 
+  socket.on("disconnect", function () {
+    console.log("user disconnected");
+  });
+});
 
 /**
  * -------------- GENERAL SETUP ----------------
@@ -18,6 +30,8 @@ require("./app/config/database");
 // Must first load the models
 require("./app/models/User");
 require("./app/models/ProfilUser");
+require("./app/models/Chat");
+require("./app/models/Message");
 // Pass the global passport object into the configuration function
 require("./app/config/passport")(passport);
 
