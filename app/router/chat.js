@@ -7,7 +7,7 @@ const chatController = require("../controllers/chatController");
 
 
 // new conversation
-router.post("/create/conversation", chatController.createChat);
+router.post("/create/chat", chatController.createChat);
 
 // get conversation of user
 router.get("/chat/:userId", chatController.getChatByUserId)
