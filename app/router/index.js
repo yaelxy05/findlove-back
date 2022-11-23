@@ -1,8 +1,8 @@
 const router = require('express').Router();
 
-router.use('/users', require('./users'));
-router.use('/', require('./profilUser'));
-router.use('/', require('./chat'));
-router.use('/', require('./message'));
+router.use('/api/users', require('./users'));
+router.use('/api', require('./profilUser'));
+router.use('/api', require('./chat'));
+router.use('/api', require('./message'));
 
 module.exports = router;
