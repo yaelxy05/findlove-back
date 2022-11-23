@@ -46,6 +46,7 @@ exports.register = (req, res, next) => {
   const hash = saltHash.hash;
 
   const newUser = new User({
+    city: req.body.city,
     firstname: req.body.firstname,
     lastname: req.body.lastname,
     birthdate: req.body.birthdate,
@@ -56,11 +57,37 @@ exports.register = (req, res, next) => {
     hash: hash,
     salt: salt,
   });
-  console.log(req.body.birthdate);
+  console.log(newUser);
 
   try {
     newUser.save().then((user) => {
       res.status(201).json({ success: true, user: user });
+    });
+  } catch (err) {
+    res.json({ success: false, msg: err });
+  }
+};
+
+exports.getInfoUser = async (req, res, next) => {
+  const user = await req.user;
+  try {
+    res.status(200).json({
+      success: true,
+      msg: "You are successfully authenticated to this route!",
+      user,
+    });
+  } catch (err) {
+    res.json({ success: false, msg: err });
+  }
+};
+
+exports.getUserAll = async (req, res, next) => {
+  const userAll = await User.find();
+
+  try {
+    res.status(200).json({
+      success: true,
+      userAll,
     });
   } catch (err) {
     res.json({ success: false, msg: err });

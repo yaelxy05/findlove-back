@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const UserSchema = new mongoose.Schema({
+  city: {
+    type: String,
+    required: true
+  },
   sexe: {
     type: String,
     required:true,

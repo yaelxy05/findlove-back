@@ -3,12 +3,18 @@ const path = require("path");
 const passport = require("passport");
 const app = express();
 const http = require("http");
+const cors = require("cors");
+
+
+app.use(cors());
+
 /***
  *  ------------- Socket IO --------------------
  */
 const io = require("socket.io")(8900, {
   cors: {
     origin: "http://localhost:3000",
+    credentials: true,
   },
 });
 
@@ -94,6 +100,7 @@ app.use(require("./app/router"));
 /**
  * -------------- SERVER ----------------
  */
+
 
 // Server listens on http://localhost:8000
 app.listen(8000, () => {

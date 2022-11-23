@@ -9,8 +9,9 @@
 
 ## <span style="text-decoration:underline">Routes login && register</span>
 ### login and register user (POST) (create user and login user)
-  - `http://localhost:8000/api/register`
-  - `http://localhost:8000/api/login`
+  - `http://localhost:8000/api/users/register`
+  - `http://localhost:8000/api/users/login`
+  - `http://localhost:8000/api/users/info-user`
 --- 
 ## <span style="text-decoration:underline">Routes profil</span>
 ### create profil user (POST) (create an user profil)
