@@ -1,61 +1,49 @@
 const mongoose = require("mongoose");
 const User = mongoose.model("User");
-const utils = require("../lib/utils");
-
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 // Package pour les variables d'environements
 require("dotenv").config();
 
-exports.signUp = (req, res, next) => {
-  User.findOne({ username: req.body.username })
-    .then((user) => {
-      if (!user) {
-        return res
-          .status(401)
-          .json({ success: false, msg: "could not find user" });
-      }
+exports.signUp = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email });
+    if (!user) return res.status(400).json({ msg: "User does not exist." });
 
-      // Function defined at bottom of app.js
-      const isValid = utils.validPassword(
-        req.body.password,
-        user.hash,
-        user.salt
-      );
-
-      if (isValid) {
-        const tokenObject = utils.issueJWT(user);
-
-        res.status(200).json({
-          success: true,
-          token: tokenObject.token,
-          expiresIn: tokenObject.expires,
-        });
-      } else {
-        res
-          .status(401)
-          .json({ success: false, msg: "you entered the wrong password" });
-      }
-    })
-    .catch((err) => {
-      next(err);
-    });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    delete user.password;
+    res.status(200).json({ token, user });
+  } catch (error) {
+    console.log("message error login :", error);
+    res.status(500).json({ error: error.message });
+  }
 };
-exports.register = (req, res, next) => {
-  const saltHash = utils.genPassword(req.body.password);
-
-  const salt = saltHash.salt;
-  const hash = saltHash.hash;
+exports.register = async (req, res, next) => {
+  const {
+    firstname,
+    lastname,
+    email,
+    password,
+    city,
+    sexe,
+    search,
+    birthdate,
+  } = req.body;
+  const salt = await bcrypt.genSalt();
+  const passwordHash = await bcrypt.hash(password, salt);
 
   const newUser = new User({
-    city: req.body.city,
-    firstname: req.body.firstname,
-    lastname: req.body.lastname,
-    birthdate: req.body.birthdate,
-    sexe: req.body.sexe,
-    search: req.body.search,
-    email: req.body.email,
-    username: req.body.username,
-    hash: hash,
-    salt: salt,
+    city,
+    firstname,
+    lastname,
+    birthdate,
+    sexe,
+    search,
+    email,
+    password: passwordHash,
   });
   console.log(newUser);
 
@@ -69,7 +57,9 @@ exports.register = (req, res, next) => {
 };
 
 exports.getInfoUser = async (req, res, next) => {
-  const user = await req.user;
+  const user = await User.find({ _id: req.user.id });
+
+  console.log(user);
   try {
     res.status(200).json({
       success: true,
@@ -82,7 +72,8 @@ exports.getInfoUser = async (req, res, next) => {
 };
 
 exports.getUserAll = async (req, res, next) => {
-  const userAll = await User.find();
+  // $ne avec req.user.id permet de filtrer tous les user sauf celui qui est
+  const userAll = await User.find({ _id: { $ne: req.user.id } });
 
   try {
     res.status(200).json({

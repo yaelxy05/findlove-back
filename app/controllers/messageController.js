@@ -4,17 +4,18 @@
 const mongoose = require("mongoose");
 const Message = mongoose.model("Message");
 const Chat = mongoose.model("Chat");
+const User = mongoose.model("User");
 
 exports.createMessage = async (req, res) => {
-  const { chatId } = req.params;
-  const chat = await Chat.findById(chatId);
-
-  const sender = req.params.senderId;
+  const { conversationId } = req.params;
+  const { receiverId } = req.params;
+ 
 
   const newMessage = await new Message({
-    sender: sender,
-    conversationId: chat._id,
-    text: req.body.text,
+    receiverId:receiverId,
+    conversationId: conversationId,
+    content: req.body.content,
+    //sender: sender
   });
 
   try {
@@ -26,10 +27,16 @@ exports.createMessage = async (req, res) => {
 };
 
 exports.getMessageByConversationId = async (req, res) => {
+  const conversationId = req.params.conversationId;
+  
   try {
     const messages = await Message.find({
-      conversationId: req.params.conversationId,
-    });
+      conversationId: conversationId,
+    })
+      .populate("conversationId")
+
+    console.log(messages);
+
     res.status(200).json(messages);
   } catch (err) {
     res.status(500).json(err);

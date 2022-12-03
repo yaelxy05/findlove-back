@@ -18,12 +18,11 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: null },
-  username: String,
-  hash: String,
-  salt: String,
-  profilUserId: { type: Schema.Types.ObjectId, ref: "ProfilUser" },
+  password: {
+    type: String,
+    required: true,
+    min: 5,
+  },
   lastname: {
     type: String,
     required: true,
@@ -36,6 +35,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   }
-});
+},
+{ timestamps: true });
 
 mongoose.model("User", UserSchema);

@@ -1,6 +1,5 @@
 const express = require("express");
 const path = require("path");
-const passport = require("passport");
 const app = express();
 const http = require("http");
 const cors = require("cors");
@@ -11,6 +10,7 @@ app.use(cors());
 /***
  *  ------------- Socket IO --------------------
  */
+
 const io = require("socket.io")(8900, {
   cors: {
     origin: "http://localhost:3000",
@@ -18,46 +18,26 @@ const io = require("socket.io")(8900, {
   },
 });
 
-let users = [];
 
-const addUser = (userId, socketId) => {
-  !users.some((user) => user.userId === userId) &&
-    users.push({ userId, socketId });
-};
+let buyNsp = io.of("/buy");
+buyNsp.on('connection', function (socket){
+  buyNsp.emit("MyEvent", "je suis à coté")
+})
 
-const removeUser = (socketId) => {
-  users = users.filter((user) => user.socketId !== socketId);
-};
+let sellNsp = io.of("/sell");
+sellNsp.on('connection', function (socket){
+  sellNsp.emit("MyEvent", "easy")
+})
 
-const getUser = (userId) => {
-  return users.find((user) => user.userId === userId);
-};
+io.on("connection", function (socket) {
+  console.log("New user is connected!!");
 
-io.on("connection", (socket) => {
-  // quand un user est connecté
-  console.log("a user is connected.");
-
-  // prend l'userId et le socketId de l'user
-  socket.on("addUser", (userId) => {
-    addUser(userId, socket.id);
-    io.emit("getUsers", users);
+  socket.on("disconnect", function () {
+    console.log("User disconnected!");
   });
-
-  // envoie et récupère les messages
-  socket.on("sendMessage", ({ senderId, receiverId, text }) => {
-    const user = getUser(receiverId);
-    io.to(user.socketId).emit("getMessage", {
-      senderId,
-      text,
-    });
-  });
-
-  // quand un user est déconnecté
-  socket.on("disconnect", () => {
-    console.log("a user is disconnected!");
-    removeUser(socket.id);
-    io.emit("getUsers", users);
-  });
+  socket.on("messageClient", function (msg) {
+    console.log(msg);
+  })
 });
 
 /**
@@ -75,11 +55,8 @@ require("./app/models/User");
 require("./app/models/ProfilUser");
 require("./app/models/Chat");
 require("./app/models/Message");
-// Pass the global passport object into the configuration function
-require("./app/config/passport")(passport);
 
-// This will initialize the passport object on every request
-app.use(passport.initialize());
+
 
 // Instead of using body-parser middleware, use the new Express implementation of the same thing
 app.use(express.json());
@@ -100,7 +77,6 @@ app.use(require("./app/router"));
 /**
  * -------------- SERVER ----------------
  */
-
 
 // Server listens on http://localhost:8000
 app.listen(8000, () => {

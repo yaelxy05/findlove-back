@@ -11,7 +11,9 @@
 ### login and register user (POST) (create user and login user)
   - `http://localhost:8000/api/users/register`
   - `http://localhost:8000/api/users/login`
-  - `http://localhost:8000/api/users/info-user`
+### Informations user single and list
+  - `http://localhost:8000/api/users/info-user` 
+  - `http://localhost:8000/api/users/user-list`
 --- 
 ## <span style="text-decoration:underline">Routes profil</span>
 ### create profil user (POST) (create an user profil)
@@ -21,7 +23,7 @@
 ---
 ## <span style="text-decoration:underline">Routes Chat</span>
 ### Create chat (POST)
-  - `http://localhost:8000/api/create/chat`
+  - `http://localhost:8000/api/create/chat/:receiverId`
 ### get chat of user
   - `http://localhost:8000/api/chat/:userId`
 ---
